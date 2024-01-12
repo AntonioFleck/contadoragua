@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contador de Água</title>
+    <style>
+        body {
+            background-color: #3498db;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            color: #fff;
+        }
+        #container {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #2980b9;
+        }
+        h1 {
+            font-size: 24px;
+        }
+        #contador {
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+        button {
+            background-color: #2ecc71;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        #registro {
+            margin-top: 20px;
+        }
+        table {
+            width: 100%;
+            margin-top: 10px;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #fff;
+        }
+        small {
+            font-size: 12px;
+            color: #95a5a6;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <h1>Contador de Água🥤</h1>
+        <small id="dataHoje">Hoje é ${getDiaDaSemana()} - ${getDiaAtual()}</small>
+        <div id="contador">0 L</div>
+        <button onclick="adicionarAgua()">+</button>
+        <button onclick="removerAgua()">-</button>
+        <div id="registro">
+            <h2>Registro Diário</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Litros Consumidos</th>
+                    </tr>
+                </thead>
+                <tbody id="registroBody">
+                    <!-- Aqui será adicionado o conteúdo da tabela dinamicamente com JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Função para adicionar água
+        function adicionarAgua() {
+            let contador = document.getElementById("contador");
+            let valorAtual = parseInt(contador.innerText);
+            valorAtual += 1;
+            contador.innerText = valorAtual + " L";
+            atualizarRegistroDiario(valorAtual);
+        }
+
+        // Função para remover água
+        function removerAgua() {
+            let contador = document.getElementById("contador");
+            let valorAtual = parseInt(contador.innerText);
+            if (valorAtual > 0) {
+                valorAtual -= 1;
+                contador.innerText = valorAtual + " L";
+                atualizarRegistroDiario(valorAtual);
+            }
+        }
+
+        // Função para obter o dia da semana
+        function getDiaDaSemana() {
+            const diasDaSemana = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
+            const dataAtual = new Date();
+            return diasDaSemana[dataAtual.getDay()];
+        }
+
+        // Função para obter o dia atual
+        function getDiaAtual() {
+            const dataAtual = new Date();
+            return `${dataAtual.getDate()}/${dataAtual.getMonth() + 1}`;
+        }
+
+        // Função para atualizar o registro diário
+        function atualizarRegistroDiario(valorAtual) {
+            let dataAtual = new Date();
+            let dataFormatada = `${getDiaDaSemana()} - ${getDiaAtual()}`;
+            let registroBody = document.getElementById("registroBody");
+
+            // Verifica se já existe um registro para o dia atual
+            let linhas = registroBody.getElementsByTagName("tr");
+            for (let i = 0; i < linhas.length; i++) {
+                let celulaData = linhas[i].getElementsByTagName("td")[0];
+                if (celulaData.innerHTML === dataFormatada) {
+                    let celulaLitros = linhas[i].getElementsByTagName("td")[1];
+                    celulaLitros.innerHTML = `${valorAtual} L`;
+                    // Salva o valor atual nos cookies
+                    document.cookie = `litros=${valorAtual}`;
+                    return; // Sai da função se o registro já existir
+                }
+            }
+
+            // Se não existir, adiciona uma nova linha na tabela
+            let newRow = registroBody.insertRow();
+            let cell1 = newRow.insertCell(0);
+            let cell2 = newRow.insertCell(1);
+
+            cell1.innerHTML = dataFormatada;
+            cell2.innerHTML = `${valorAtual} L`;
+
+            // Salva o valor atual nos cookies
+            document.cookie = `litros=${valorAtual}`;
+        }
+
+        // Verifica se há algum valor salvo nos cookies e exibe na página
+        window.onload = function () {
+            let cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                let cookie = cookies[i].trim();
+                if (cookie.startsWith("litros=")) {
+                    let valorAtual = parseInt(cookie.substring("litros=".length));
+                    document.getElementById("contador").innerText = valorAtual + " L";
+                    atualizarRegistroDiario(valorAtual);
+                }
+            }
+        };
+        // Atualiza o conteúdo do elemento small com a data atual
+document.getElementById("dataHoje").innerText = `Hoje é ${getDiaDaSemana()} - ${getDiaAtual()}`;
+    </script>
+</body>
+</html>
